@@ -1,0 +1,49 @@
+load('DGHV.sage')
+
+gamma, eta, rho = 2000, 160, 15
+dghv = DGHV(gamma, eta, rho)
+
+def less_equal_homomorphic(dghv, n=3):
+    m0 = ZZ.random_element(0, 2^n)
+    m1 = ZZ.random_element(0, 2^n)
+    print(f"{m0} >= {m1}?")
+
+    # Bits inverted, presented from MSB to LSB
+    bits0 = m0.digits(base=2, padto=n)[::-1] 
+    bits1 = m1.digits(base=2, padto=n)[::-1]
+    
+    c0 = [dghv.enc(b) for b in bits0]
+    c1 = [dghv.enc(b) for b in bits1]
+
+    #Acumulators
+    is_greater = dghv.enc(0)
+    is_equal = dghv.enc(1)
+
+    for i in range(n):
+        # bit_a > bit_b: (NOT a) AND b
+        # If a = 1 and b = 0 a is bigger
+        # When the first bit for it to happen we know a<b
+        gt_i = dghv.mult(dghv.not_gate(c1[i]), c0[i])
+        
+        # bit_a == bit_b: NOT (a XOR b)
+        eq_i = dghv.not_gate(dghv.add(c0[i], c1[i]))
+
+        # is_greater = is_greater OR (is_equal_previous AND gt_i)
+        # For a<b, every bit analysed before has to be equal 
+        term = dghv.mult(is_equal, gt_i)
+
+        # Check the first time a bit in a is less than in b (a<b)
+        is_greater = dghv.add(is_greater, term) 
+
+        # Change to 0 if bit a != bit b
+        is_equal = dghv.mult(is_equal, eq_i)
+
+    # Answer: (A < B) OR (A == B)
+    # Add is_greater and is_equal to verify
+    res_le = dghv.add(is_greater, is_equal)
+    
+    dec_res = dghv.dec(res_le)
+    print(f"Answer decrypted: {dec_res}")
+    assert (m0 >= m1) == dec_res
+
+less_equal_homomorphic(dghv, n=3)
