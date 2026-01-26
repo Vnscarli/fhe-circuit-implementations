@@ -1,0 +1,5 @@
+**/*.sage.py
+__pycache__/
+*.pyc
+.pytest_cache/
+CACHEDIR.TAG

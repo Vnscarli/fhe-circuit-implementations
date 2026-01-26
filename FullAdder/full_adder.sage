@@ -1,7 +1,6 @@
 load('DGHV.sage')
 
-gamma, eta, rho = 2000, 160, 15
-dghv = DGHV(gamma, eta, rho)
+
 
 def full_adder(dghv, bit_a, bit_b, carry):
     ca = dghv.enc(bit_a)
@@ -19,5 +18,3 @@ def full_adder(dghv, bit_a, bit_b, carry):
     carry_out = dghv.add(a_and_b, carry_and_axorb)
     return soma, carry_out
 
-s, cout = full_adder(dghv, 0, 0, 0)
-print(f"The sum is {dghv.dec(s)}, with a CarryOut = {dghv.dec(cout)}")
