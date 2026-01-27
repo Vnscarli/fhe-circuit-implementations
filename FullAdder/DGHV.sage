@@ -57,3 +57,6 @@ class DGHV:
 
     def mult(self, c1, c2):
         return (c1 * c2) % self.x0
+    
+    def bootstrap(self, ciphertext):
+        return self.enc(self.dec(ciphertext))
